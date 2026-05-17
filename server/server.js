@@ -209,7 +209,7 @@ const server = http.createServer((req, res) => {
 
             // user gets 4 attempts
             sessions[sid].attempts++;
-            if (sessions[sid] > 5) {
+            if (sessions[sid].attempts > 4) {
                 delete sessions[sid];
             }
 
