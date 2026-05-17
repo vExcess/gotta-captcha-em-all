@@ -211,6 +211,8 @@ const server = http.createServer((req, res) => {
             sessions[sid].attempts++;
             if (sessions[sid].attempts > 4) {
                 delete sessions[sid];
+                res.writeHead(200);
+                res.end("FAIL - EXPIRED");
             }
 
             // console.log("VERIFY", sid, sessions[sid], userGuess, userWork);

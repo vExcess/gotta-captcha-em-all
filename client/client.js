@@ -60,7 +60,7 @@ class CAPTCHA {
 
                     fetch(`${that.config.captchaServer}/verify`, {
                         method: "POST",
-                        body: `session=${that.sessionId}&answer=${that.config.containerEl.getElementsByTagName("input")[0]?.value}&work=${that.finalWork.join(",")}`
+                        body: `session=${that.sessionId}&answer=${that.config.containerEl.getElementsByTagName("input")[0]?.value?.toUpperCase()}&work=${that.finalWork.join(",")}`
                     }).then(res => res.text()).then(txt => {
                         if (txt.length === 32) {
                             that.status = 1;
@@ -299,7 +299,7 @@ async function createCaptcha(config) {
 
             fetch(`${server}/verify`, {
                 method: "POST",
-                body: `session=${captcha.sessionId}&answer=${containerEl.getElementsByTagName("input")[0]?.value}&work=${captcha.finalWork.join(",")}`
+                body: `session=${captcha.sessionId}&answer=${containerEl.getElementsByTagName("input")[0]?.value?.toUpperCase()}&work=${captcha.finalWork.join(",")}`
             }).then(res => res.text()).then(txt => {
                 if (txt.length === 32) {
                     captcha.status = 1;
