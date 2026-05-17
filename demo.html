@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>New webpage</title>
+    
+    <script src="https://cdn.jsdelivr.net/gh/microslop-mirror/drawlite@main/javascript/drawlite.js"></script>
+    <script src="http://127.0.0.1:3005/client.js"></script>
+</head>
+<body>
+
+    <h1>Create Account</h1>
+
+    <input type="text" placeholder="username">
+    <input type="text" placeholder="password">
+    <button>Submit</button>
+    
+    <br><br>
+    
+    <div id="captcha"></div>
+    <script>
+        createCaptcha({
+            containerEl: document.getElementById("captcha"),
+            captchaServer: "http://127.0.0.1:3005/",
+            workerScriptPath: "http://127.0.0.1:3005/pow-worker.js",
+            onSuccess: (verifiedKey) => {
+                document.body.innerHTML = "Creating account...";
+
+                fetch("http://127.0.0.1:3005/validateKey", {
+                    method:"POST",
+                    body: `verifierKey=superSecretPassword&key=${verifiedKey}`
+                }).then(res => res.text()).then(txt => {
+                    if (txt === "PASS") {
+                        document.body.innerHTML += "<br>Account created";
+                    } else {
+                        document.body.innerHTML += "<br>Account creation failed";
+                    }
+                })
+            }
+        });
+    </script>
+
+</body>
+</html>

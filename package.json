@@ -1,0 +1,11 @@
+{
+  "name": "gotta-captcha-server",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "dependencies": {
+    "canvas": "^3.2.3"
+  }
+}

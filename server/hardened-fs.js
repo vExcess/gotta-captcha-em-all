@@ -1,0 +1,73 @@
+/*
+    Hopefully our code is completely free from vulnerabilities.
+    However, in the case that it's not, as a failsafe I create
+    a hardened version of the file system API. With my API, even
+    if an attacker gets the ability to try and access arbitrary files,
+    my API will block access to all files not explicitly whitelisted
+    as safe for public access.
+*/
+
+const fs = require("node:fs");
+const Path = require("node:path");
+
+// the only valid option is { elevatedPermissions: true }
+// yes, it could have been made a simple boolean argument
+// but I made it so you must type out the whole "elevatedPermissions"
+// so that you are sure you want to be using elevated permissions
+function hasAccess(filePath, options) {
+    const elevatedPermissions = options?.elevatedPermissions === true ? true : false;
+
+    const absProjectPath = Path.normalize(process.cwd() + "/");
+
+    const absFilePath = Path.normalize(absProjectPath + (filePath));
+
+    const whitelist = [
+        "client/",
+        "shared/"
+    ];
+
+    if (absFilePath.startsWith(absProjectPath)) {
+        let approved = false;
+        if (elevatedPermissions) {
+            approved = true;
+        } else {
+            const subFilePath = absFilePath.slice(absProjectPath.length).replace(/\\/g, "/");
+            for (const pattern of whitelist) {
+                if (subFilePath.startsWith(pattern)) {
+                    approved = true;
+                    break;
+                }
+            }
+        }
+        
+        return { approved, absFilePath };
+    }
+
+    return false;
+}
+
+function readFileSync(filePath, options) {
+    const { approved, absFilePath } = hasAccess(filePath, options);
+    if (approved) {
+        if (fs.existsSync(absFilePath)) {
+            return fs.readFileSync(absFilePath);
+        }
+        return null;
+    } else {
+        throw `Permission denied while reading ${filePath}`;
+    }
+}
+
+function existsSync(filePath, options) {
+    const { approved, absFilePath } = hasAccess(filePath, options);
+    if (approved) {
+        return fs.existsSync(absFilePath);
+    } else {
+        throw `Permission denied while reading ${filePath}`;
+    }
+}
+
+module.exports = {
+    readFileSync,
+    existsSync
+};
